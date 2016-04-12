@@ -11,35 +11,18 @@ physics.setGravity( 0, display.contentHeight / 25.0 )
 
 local widget = require("widget")
 local scene = composer.newScene()
+local game = display.newGroup();
+local bottom = nil;
+local top = nil;
 
 -- -----------------------------------------------------------------------------------------------------------------
 -- All code outside of the listener functions will only be executed ONCE unless "composer.removeScene()" is called
 -- -----------------------------------------------------------------------------------------------------------------
 
 -- Globals
-local playerBall = display.newCircle(display.contentCenterX, 
-	display.contentHeight*4-150, display.contentWidth / 35.0);
-
-local scrollAmt = -10;
-local scrollView = nil;
+local playerBall = nil;
 
 local gameStarted = false;
-
-
-local function scrollListener(event)
-	local phase = event.phase;
-	local direction = event.direction;
-
-	print(scrollView:getContentPosition())
-
-	if(event.limitReached) then
-		if(direction == "up") then
-			print("up limit reached");
-		elseif (direction == "down") then
-			print("down limit reached");
-		end
-	end
-end
 
 local function colorObject( object )
 	-- Colors here are from http://www.avatar.se/molscript/doc/colour_names.html
@@ -47,56 +30,82 @@ local function colorObject( object )
 	if ( i ==  1) then
 		-- set to cyan
 		object:setFillColor(0,1,1);
-		object.tag = "cyan";
+		object.colorTag = "cyan";
 	elseif ( i == 2 ) then
 		-- set to purple
 		object:setFillColor(0.627451, 0.12549, 0.941176)
-		object.tag = "purple";
+		object.colorTag = "purple";
 	elseif ( i == 3 ) then
 		-- set to orange
 		object:setFillColor(1, 0.647059, 0)
-		object.tag = "orange";
+		object.colorTag = "orange";
 	else -- ( i == 4 ) 
 		-- set to chartreuse
 		object:setFillColor(0.498039, 1, 0)
-		object.tag = "chartreuse";
+		object.colorTag = "chartreuse";
 	end
+end
+
+local function reset()
+	physics.removeBody(playerBall);
+	playerBall.y = display.contentHeight-150;
+	game.y = 0;
+	bottom.y = display.contentHeight-20;
+	top.y = 0;
+	gameStarted = false;
+end
+
+local function gameOver()
+	timer.performWithDelay(
+		100,
+		function()
+			reset();
+		end,
+		1
+	);
+	
 end
 
 local function ballCollision ( event )
 	if (event.phase=="began" and event.other.name ~= nil) then
-		if(event.other.name == "top") then
-			local newX,newY = scrollView:getContentPosition();
+		if(event.other.name == "bottom") then
+			gameOver();
+		elseif(string.find(event.other.name, "testObs_") ~= nil) then
+			print("collided with " .. event.other.name);
 
-			scrollView:scrollToPosition{
-			    --y = scrollAmt,
-			    y = newY + 100,
-			    time = 800
-			}
-
-			-- timer.performWithDelay(1,
-			-- 	function()
-			-- 		top.y = top.y + scrollAmt;
-			-- 		bottom.y = bottom.y + scrollAmt;
-			-- 		--testbox.y = testbox.y - 10;
-			-- 	end,
-			-- 1)
-
-			scrollAmt = scrollAmt - 10;
-
-			--print(scrollView.scrollHeight)
+			if(playerBall.colorTag == event.other.colorTag) then
+				print("you may pass");
+			else
+				print("none shall pass");
+				--gameOver();
+			end
 		end
 	end
 end
 
 local function screenTap ( event )
-
 	if ( gameStarted == false ) then -- leaving ball stationary until first tap
-		physics.addBody (playerBall, "dynamic");
+		physics.addBody (playerBall, "dynamic", { density=-.5, friction=0.0, bounce=0.2, radius=30 });
 		gameStarted = true;
 	end
 	
-	playerBall:applyForce(0,-15, playerBall.x, playerBall.y)
+	local delta = top.y - playerBall.y;
+	--print(delta, delta/100)
+	-- playerBall:applyForce(0,-25, playerBall.x, playerBall.y);
+	playerBall:applyForce(0, delta/35, playerBall.x, playerBall.y);
+end
+
+local function moveView()
+	if(playerBall ~= nil) then
+		--print("top", top.y)
+		-- print(game.topBounds);
+		local delta = playerBall.y - top.y;
+		if(delta < 500 and playerBall.y > -5000) then
+			top.y = top.y - 10;
+			game.y = game.y + 10;
+			bottom.y = bottom.y - 10;
+		end
+	end
 end
 
 -- -------------------------------------------------------------------------------
@@ -109,6 +118,43 @@ function scene:create( event )
 
     -- Initialize the scene here
     -- Example: add display objects to "sceneGroup", add touch listeners, etc.
+end
+
+local function addSomeTestObstacles()
+	local testObs = {"box", "circle", "rect"};
+	local numTestObs = 10;
+	local testObsY = 300;
+
+	for obsNum = 1, numTestObs do
+		local randInd = math.random(1, #testObs);
+		local testObsType = testObs[randInd];
+
+		local testObs = nil;
+
+		if(testObsType == "box") then
+			testObs = display.newRect(display.contentWidth/2, testObsY, 200, 200);
+		elseif(testObsType == "circle") then
+			testObs = display.newCircle(display.contentCenterX, testObsY, display.contentWidth / 15.0);
+		elseif(testObsType == "rect") then
+			testObs = display.newRect(display.contentWidth/2, testObsY, 300, 200);
+		end
+
+		timer.performWithDelay(
+			10,
+			function()
+				testObs.rotation = testObs.rotation + 1;
+			end,
+			0
+		);
+
+		testObs.name = "testObs_" .. obsNum;
+		colorObject(testObs);
+		physics.addBody(testObs, "static");
+		testObs.isSensor = true;
+		game:insert(testObs);
+
+		testObsY = testObsY - 300;
+	end
 end
 
 
@@ -124,51 +170,38 @@ function scene:show( event )
         -- Called when the scene is now on screen
 		
 		local BoxLineWidth = 2;
-		local left = display.newRect(0,0,20, display.contentHeight);
-		local right = display.newRect(display.contentWidth-20,0,20,display.contentHeight);
-		local bottom = display.newRect(0,display.contentHeight*4,display.contentWidth, 20);
-		local top = display.newRect(0,display.contentHeight*4-800,display.contentWidth, 20);
-		top.name = "top";
-		left:setFillColor(0,0,0);
-		right:setFillColor(0,0,0);
+		-- local left = display.newRect(0,0,20, display.contentHeight);
+		-- local right = display.newRect(display.contentWidth-20,0,20,display.contentHeight);
+		top = display.newRect(0,0,display.contentWidth, 20);
+		bottom = display.newRect(0,display.contentHeight-20,display.contentWidth, 20);
+		bottom.name = "bottom";
+		-- top.name = "top";
+		-- left:setFillColor(0,1,0);
+		-- right:setFillColor(0,1,0);
+		top:setFillColor(0,0,0);
 		bottom:setFillColor(0,1,0);
-		top:setFillColor(1,0,0);	
 							   
-		left.anchorX = 0;left.anchorY = 0;
-		right.anchorX = 0;right.anchorY = 0;
+		-- left.anchorX = 0;left.anchorY = 0;
+		-- right.anchorX = 0;right.anchorY = 0;
 		bottom.anchorX = 0;bottom.anchorY = 0;
 		top.anchorX = 0;top.anchorY = 0;
 		physics.addBody( bottom, "static" );
-		physics.addBody( top, "static" );
+		-- physics.addBody( top, "static" );
 
-		-- add a box for testing scrolling up
-		local testbox = display.newRect(210, -50,200, 200);
+		game:insert(bottom);
+		game:insert(top);
+		-- game:insert(left);
+		-- game:insert(right);
+		-- game:insert(testbox);
 
-		scrollView = widget.newScrollView{
-			left = 0,
-			top = 0,
-			width = display.contentWidth,
-			height = display.contentHeight,
-			scrollHeight = display.contentHeight * 2,
-			topPadding = 0,
-			bottomPadding = 0,
-			horizontalScrollDisabled = true,
-			verticalScrollDisabled = false,
-			listener = scrollListener,
-			backgroundColor = {0, 0, 0},
-		}
-
-		scrollView:insert(bottom);
-		scrollView:insert(top);
-		scrollView:insert(testbox);
+		playerBall = display.newCircle(display.contentCenterX, 
+			display.contentHeight-150, display.contentWidth / 35.0);
 		
 		playerBall:addEventListener("collision", ballCollision);
 		colorObject(playerBall);
-		scrollView:insert(playerBall);
-		
-		Runtime:addEventListener("tap", screenTap);
+		game:insert(playerBall);
 
-		scrollView:scrollTo( "bottom", { time=100} )
+		addSomeTestObstacles();
     end
 end
 
@@ -207,6 +240,8 @@ scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )
 scene:addEventListener( "hide", scene )
 scene:addEventListener( "destroy", scene )
+Runtime:addEventListener( "tap", screenTap );
+Runtime:addEventListener( "enterFrame", moveView );
 
 -- -------------------------------------------------------------------------------
 
