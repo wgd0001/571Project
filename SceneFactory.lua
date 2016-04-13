@@ -21,8 +21,8 @@ local top = nil;
 
 -- Globals
 local playerBall = nil;
-
 local gameStarted = false;
+local deadMeat = false;
 
 local function colorObjectCyan( object ) 
 	object:setFillColor(0,1,1);
@@ -69,6 +69,8 @@ local function reset()
 	bottom.y = display.contentHeight-20;
 	top.y = 0;
 	gameStarted = false;
+	colorObject(playerBall);
+	deadMeat = false;
 end
 
 local function gameOver()
@@ -79,20 +81,36 @@ local function gameOver()
 		end,
 		1
 	);
-	
+end
+
+local function explode ( event )
+	for i = 1, 10 do
+		local radius = math.random(1, 10);
+		local circle = display.newCircle(event.source.params.x, event.source.params.y, radius);
+		colorObject(circle);
+		physics.addBody(circle, "dynamic", { density=-.5, friction=0.0, bounce=1, radius=radius });
+		circle:applyForce(math.random(3, 5), 0, x, y);
+		circle.name = "garbage"
+	end
 end
 
 local function ballCollision ( event )
 	if (event.phase=="began" and event.other.name ~= nil) then
-		if(event.other.name == "bottom") then
+		if(event.other.name == "bottom" ) then
 			gameOver();
+		elseif ( event.name == "garbage" or event.other.name == "garbage") then
+			-- no op
 		elseif(string.find(event.other.name, "testObs_") ~= nil) then
 			print("collided with " .. event.other.name);
 
 			if(playerBall.colorTag == event.other.colorTag) then
 				print("you may pass");
-			else
+			elseif ( deadMeat ~= true ) then 
+				deadMeat = true;
 				print("none shall pass");
+				local tm = timer.performWithDelay(10, explode);
+				tm.params = {x = playerBall.x, y= playerBall.y}
+				playerBall:setFillColor(0,0,0);
 				--gameOver();
 			end
 		end
@@ -136,51 +154,33 @@ function scene:create( event )
     -- Example: add display objects to "sceneGroup", add touch listeners, etc.
 end
 
+function moveRight( object ) 
+	transition.to(object, {x=object.x + display.contentWidth, time=3000, 
+	                       onComplete= function(obj) 
+								moveLeft(obj, object);
+						   end
+						   } );
+end	
+
+function moveLeft( object ) 
+	transition.to(object, {x=object.x - display.contentWidth, time=3000, 
+	                       onComplete= function(obj) 
+								moveRight(obj, object);
+						   end
+						   } );
+end
+
+function moveBackAndForthForever( object ) 
+	moveRight(object);
+end
+
 local function addSomeTestObstacles()
 	local testObs = {"box", "circle", "rect"};
 	local numTestObs = 10;
 	local testObsY = 300;
 	
 	local blockX = 0 - display.contentWidth + display.contentWidth/8;
-	for i = 1 , 8 do
-		local block = display.newRect(blockX, testObsY, display.contentWidth/4.0, 50);
-		blockX = blockX + display.contentWidth/4.0;
-		if ( (i % 4) == 0 ) then 
-			colorObjectCyan(block);
-		elseif ( (i % 4) == 1 ) then
-			colorObjectOrange(block);
-		elseif ( (i % 4) == 2 ) then
-			colorObjectGreen(block);
-		else -- ( (i % 4) == 3 ) then 
-			colorObjectPurple(block);
-		end
-		physics.addBody(block, "static");
-		block.isSensor = true;
-		game:insert(block);
-		block.name = "testObs_" .. i;
-	end
-	blockX = - 120 - display.contentWidth + display.contentWidth/8 ;
-	testObsY = testObsY - 50;
 	for i = 1 , 9 do
-		local block = display.newRect(blockX, testObsY, display.contentWidth/4.0, 50);
-		blockX = blockX + display.contentWidth/4.0;
-		if ( (i % 4) == 1 ) then 
-			colorObjectCyan(block);
-		elseif ( (i % 4) == 2 ) then
-			colorObjectOrange(block);
-		elseif ( (i % 4) == 3 ) then
-			colorObjectGreen(block);
-		else -- ( (i % 4) == 0 ) then 
-			colorObjectPurple(block);
-		end
-		physics.addBody(block, "static");
-		block.isSensor = true;
-		game:insert(block);
-		block.name = "testObs_" .. i;
-	end
-	blockX = - 240 - display.contentWidth + display.contentWidth/8 ;
-	testObsY = testObsY - 50;
-	for i = 1 , 10 do
 		local block = display.newRect(blockX, testObsY, display.contentWidth/4.0, 50);
 		blockX = blockX + display.contentWidth/4.0;
 		if ( (i % 4) == 2 ) then 
@@ -196,6 +196,47 @@ local function addSomeTestObstacles()
 		block.isSensor = true;
 		game:insert(block);
 		block.name = "testObs_" .. i;
+		moveBackAndForthForever(block);
+	end
+	blockX = - 150 - display.contentWidth + display.contentWidth/8 ;
+	testObsY = testObsY - 50;
+	for i = 10 , 20 do
+		local block = display.newRect(blockX, testObsY, display.contentWidth/4.0, 50);
+		blockX = blockX + display.contentWidth/4.0;
+		if ( (i % 4) == 0 ) then 
+			colorObjectCyan(block);
+		elseif ( (i % 4) == 1 ) then
+			colorObjectOrange(block);
+		elseif ( (i % 4) == 2 ) then
+			colorObjectGreen(block);
+		else -- ( (i % 4) == 3 ) then 
+			colorObjectPurple(block);
+		end
+		physics.addBody(block, "static");
+		block.isSensor = true;
+		game:insert(block);
+		block.name = "testObs_" .. i;
+		moveBackAndForthForever(block);
+	end
+	blockX = - 300 - display.contentWidth + display.contentWidth/8 ;
+	testObsY = testObsY - 50;
+	for i = 21 , 32 do
+		local block = display.newRect(blockX, testObsY, display.contentWidth/4.0, 50);
+		blockX = blockX + display.contentWidth/4.0;
+		if ( (i % 4) == 0 ) then 
+			colorObjectCyan(block);
+		elseif ( (i % 4) == 1 ) then
+			colorObjectOrange(block);
+		elseif ( (i % 4) == 2 ) then
+			colorObjectGreen(block);
+		else -- ( (i % 4) == 3 ) then 
+			colorObjectPurple(block);
+		end
+		physics.addBody(block, "static");
+		block.isSensor = true;
+		game:insert(block);
+		block.name = "testObs_" .. i;
+		moveBackAndForthForever(block);
 	end
 
 	-- for obsNum = 1, numTestObs do
@@ -269,6 +310,8 @@ function scene:show( event )
 
 		playerBall = display.newCircle(display.contentCenterX, 
 			display.contentHeight-150, display.contentWidth / 35.0);
+		
+		playerBall.tag = "player";
 		
 		playerBall:addEventListener("collision", ballCollision);
 		colorObject(playerBall);
