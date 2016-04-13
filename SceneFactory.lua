@@ -24,25 +24,41 @@ local playerBall = nil;
 
 local gameStarted = false;
 
+local function colorObjectCyan( object ) 
+	object:setFillColor(0,1,1);
+	object.colorTag = "cyan";
+end
+
+local function colorObjectPurple( object ) 
+	object:setFillColor(0.627451, 0.12549, 0.941176)
+	object.colorTag = "purple";
+end
+
+local function colorObjectOrange( object )
+	object:setFillColor(1, 0.647059, 0)
+	object.colorTag = "orange";
+end
+
+local function colorObjectGreen( object )
+	object:setFillColor(0.498039, 1, 0)
+	object.colorTag = "green";
+end
+
 local function colorObject( object )
 	-- Colors here are from http://www.avatar.se/molscript/doc/colour_names.html
 	local i = math.random(1, 4);
 	if ( i ==  1) then
 		-- set to cyan
-		object:setFillColor(0,1,1);
-		object.colorTag = "cyan";
+		colorObjectCyan(object);
 	elseif ( i == 2 ) then
 		-- set to purple
-		object:setFillColor(0.627451, 0.12549, 0.941176)
-		object.colorTag = "purple";
+		colorObjectPurple(object);
 	elseif ( i == 3 ) then
 		-- set to orange
-		object:setFillColor(1, 0.647059, 0)
-		object.colorTag = "orange";
+		colorObjectOrange(object);
 	else -- ( i == 4 ) 
-		-- set to chartreuse
-		object:setFillColor(0.498039, 1, 0)
-		object.colorTag = "chartreuse";
+		-- set to green
+		colorObjectGreen(object);
 	end
 end
 
@@ -124,37 +140,94 @@ local function addSomeTestObstacles()
 	local testObs = {"box", "circle", "rect"};
 	local numTestObs = 10;
 	local testObsY = 300;
-
-	for obsNum = 1, numTestObs do
-		local randInd = math.random(1, #testObs);
-		local testObsType = testObs[randInd];
-
-		local testObs = nil;
-
-		if(testObsType == "box") then
-			testObs = display.newRect(display.contentWidth/2, testObsY, 200, 200);
-		elseif(testObsType == "circle") then
-			testObs = display.newCircle(display.contentCenterX, testObsY, display.contentWidth / 15.0);
-		elseif(testObsType == "rect") then
-			testObs = display.newRect(display.contentWidth/2, testObsY, 300, 200);
+	
+	local blockX = 0 - display.contentWidth + display.contentWidth/8;
+	for i = 1 , 8 do
+		local block = display.newRect(blockX, testObsY, display.contentWidth/4.0, 50);
+		blockX = blockX + display.contentWidth/4.0;
+		if ( (i % 4) == 0 ) then 
+			colorObjectCyan(block);
+		elseif ( (i % 4) == 1 ) then
+			colorObjectOrange(block);
+		elseif ( (i % 4) == 2 ) then
+			colorObjectGreen(block);
+		else -- ( (i % 4) == 3 ) then 
+			colorObjectPurple(block);
 		end
-
-		timer.performWithDelay(
-			10,
-			function()
-				testObs.rotation = testObs.rotation + 1;
-			end,
-			0
-		);
-
-		testObs.name = "testObs_" .. obsNum;
-		colorObject(testObs);
-		physics.addBody(testObs, "static");
-		testObs.isSensor = true;
-		game:insert(testObs);
-
-		testObsY = testObsY - 300;
+		physics.addBody(block, "static");
+		block.isSensor = true;
+		game:insert(block);
+		block.name = "testObs_" .. i;
 	end
+	blockX = - 120 - display.contentWidth + display.contentWidth/8 ;
+	testObsY = testObsY - 50;
+	for i = 1 , 9 do
+		local block = display.newRect(blockX, testObsY, display.contentWidth/4.0, 50);
+		blockX = blockX + display.contentWidth/4.0;
+		if ( (i % 4) == 1 ) then 
+			colorObjectCyan(block);
+		elseif ( (i % 4) == 2 ) then
+			colorObjectOrange(block);
+		elseif ( (i % 4) == 3 ) then
+			colorObjectGreen(block);
+		else -- ( (i % 4) == 0 ) then 
+			colorObjectPurple(block);
+		end
+		physics.addBody(block, "static");
+		block.isSensor = true;
+		game:insert(block);
+		block.name = "testObs_" .. i;
+	end
+	blockX = - 240 - display.contentWidth + display.contentWidth/8 ;
+	testObsY = testObsY - 50;
+	for i = 1 , 10 do
+		local block = display.newRect(blockX, testObsY, display.contentWidth/4.0, 50);
+		blockX = blockX + display.contentWidth/4.0;
+		if ( (i % 4) == 2 ) then 
+			colorObjectCyan(block);
+		elseif ( (i % 4) == 3 ) then
+			colorObjectOrange(block);
+		elseif ( (i % 4) == 0 ) then
+			colorObjectGreen(block);
+		else -- ( (i % 4) == 1 ) then 
+			colorObjectPurple(block);
+		end
+		physics.addBody(block, "static");
+		block.isSensor = true;
+		game:insert(block);
+		block.name = "testObs_" .. i;
+	end
+
+	-- for obsNum = 1, numTestObs do
+		-- local randInd = math.random(1, #testObs);
+		-- local testObsType = testObs[randInd];
+
+		-- local testObs = nil;
+
+		-- if(testObsType == "box") then
+			-- testObs = display.newRect(display.contentWidth/2, testObsY, 200, 200);
+		-- elseif(testObsType == "circle") then
+			-- testObs = display.newCircle(display.contentCenterX, testObsY, display.contentWidth / 15.0);
+		-- elseif(testObsType == "rect") then
+			-- testObs = display.newRect(display.contentWidth/2, testObsY, 300, 200);
+		-- end
+
+		-- timer.performWithDelay(
+			-- 10,
+			-- function()
+				-- testObs.rotation = testObs.rotation + 1;
+			-- end,
+			-- 0
+		-- );
+
+		-- testObs.name = "testObs_" .. obsNum;
+		-- colorObject(testObs);
+		-- physics.addBody(testObs, "static");
+		-- testObs.isSensor = true;
+		-- game:insert(testObs);
+
+		-- testObsY = testObsY - 300;
+	-- end
 end
 
 
