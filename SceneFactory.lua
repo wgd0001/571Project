@@ -23,6 +23,8 @@ local top = nil;
 local playerBall = nil;
 local gameStarted = false;
 local deadMeat = false;
+local DelaySwap = false;
+local obsNum = 0;
 
 local function colorObjectCyan( object ) 
 	object:setFillColor(0,1,1);
@@ -174,70 +176,146 @@ function moveBackAndForthForever( object )
 	moveRight(object);
 end
 
+local function addMultiLineObs(testObsY)
+	local blockX = 0 - display.contentWidth + display.contentWidth/8;
+	if ( DelaySwap == true) then
+		DelaySwap = false;
+		waitTime = 500;
+	else
+		DelaySwap = true;
+		waitTime = 100;
+	end
+
+	for i = 1 , 9 do
+		local block = display.newRect(blockX, testObsY, display.contentWidth/4.0, 50);
+		blockX = blockX + display.contentWidth/4.0;
+		if ( (i % 4) == 3 ) then 
+			colorObjectCyan(block);
+		elseif ( (i % 4) == 0 ) then
+			colorObjectOrange(block);
+		elseif ( (i % 4) == 1 ) then
+			colorObjectGreen(block);
+		else -- ( (i % 4) == 2 ) then 
+			colorObjectPurple(block);
+		end
+		physics.addBody(block, "static");
+		block.isSensor = true;
+		game:insert(block);
+		block.name = "testObs_" .. obsNum;
+		obsNum = obsNum + 1;
+		timer.performWithDelay(
+			waitTime,
+			function()
+				moveBackAndForthForever(block);
+			end,
+			1
+		);
+	end
+	blockX = - 150 - display.contentWidth + display.contentWidth/8 ;
+	testObsY = testObsY - 50;
+	for i = 1 , 10 do
+		local block = display.newRect(blockX, testObsY, display.contentWidth/4.0, 50);
+		blockX = blockX + display.contentWidth/4.0;
+		if ( (i % 4) == 0 ) then 
+			colorObjectCyan(block);
+		elseif ( (i % 4) == 1 ) then
+			colorObjectOrange(block);
+		elseif ( (i % 4) == 2 ) then
+			colorObjectGreen(block);
+		else -- ( (i % 4) == 3 ) then 
+			colorObjectPurple(block);
+		end
+		physics.addBody(block, "static");
+		block.isSensor = true;
+		game:insert(block);
+		block.name = "testObs_" .. obsNum;
+		obsNum = obsNum + 1;
+		timer.performWithDelay(
+			waitTime,
+			function()
+				moveBackAndForthForever(block);
+			end,
+			1
+		);
+	end
+	blockX = - 300 - display.contentWidth + display.contentWidth/8 ;
+	testObsY = testObsY - 50;
+	for i = 1 , 11 do
+		local block = display.newRect(blockX, testObsY, display.contentWidth/4.0, 50);
+		blockX = blockX + display.contentWidth/4.0;
+		if ( (i % 4) == 1 ) then 
+			colorObjectCyan(block);
+		elseif ( (i % 4) == 2 ) then
+			colorObjectOrange(block);
+		elseif ( (i % 4) == 3 ) then
+			colorObjectGreen(block);
+		else -- ( (i % 4) == 0 ) then 
+			colorObjectPurple(block);
+		end
+		physics.addBody(block, "static");
+		block.isSensor = true;
+		game:insert(block);
+		block.name = "testObs_" .. obsNum;
+		obsNum = obsNum + 1;
+		timer.performWithDelay(
+			waitTime,
+			function()
+				moveBackAndForthForever(block);
+			end,
+			1
+		);
+	end
+
+	return testObsY - 400;
+end
+
+local function addSingleLineObs(testObsY)
+	local blockX = 0 - display.contentWidth + display.contentWidth/8;
+	if ( DelaySwap == true) then
+		DelaySwap = false;
+		waitTime = 500;
+	else
+		DelaySwap = true;
+		waitTime = 100;
+	end
+
+	for i = 1 , 9 do
+		local block = display.newRect(blockX, testObsY, display.contentWidth/4.0, 50);
+		blockX = blockX + display.contentWidth/4.0;
+		if ( (i % 4) == 0 ) then 
+			colorObjectCyan(block);
+		elseif ( (i % 4) == 1 ) then
+			colorObjectOrange(block);
+		elseif ( (i % 4) == 2 ) then
+			colorObjectGreen(block);
+		else -- ( (i % 4) == 3 ) then 
+			colorObjectPurple(block);
+		end
+		physics.addBody(block, "static");
+		block.isSensor = true;
+		game:insert(block);
+		block.name = "testObs_" .. obsNum;
+		obsNum = obsNum + 1;
+		timer.performWithDelay(
+			waitTime,
+			function()
+				moveBackAndForthForever(block);
+			end,
+			1
+		);	end
+	
+	return testObsY - 400;
+end
+
 local function addSomeTestObstacles()
 	local testObs = {"box", "circle", "rect"};
 	local numTestObs = 10;
 	local testObsY = 300;
 	
-	local blockX = 0 - display.contentWidth + display.contentWidth/8;
-	for i = 1 , 9 do
-		local block = display.newRect(blockX, testObsY, display.contentWidth/4.0, 50);
-		blockX = blockX + display.contentWidth/4.0;
-		if ( (i % 4) == 2 ) then 
-			colorObjectCyan(block);
-		elseif ( (i % 4) == 3 ) then
-			colorObjectOrange(block);
-		elseif ( (i % 4) == 0 ) then
-			colorObjectGreen(block);
-		else -- ( (i % 4) == 1 ) then 
-			colorObjectPurple(block);
-		end
-		physics.addBody(block, "static");
-		block.isSensor = true;
-		game:insert(block);
-		block.name = "testObs_" .. i;
-		moveBackAndForthForever(block);
-	end
-	blockX = - 150 - display.contentWidth + display.contentWidth/8 ;
-	testObsY = testObsY - 50;
-	for i = 10 , 20 do
-		local block = display.newRect(blockX, testObsY, display.contentWidth/4.0, 50);
-		blockX = blockX + display.contentWidth/4.0;
-		if ( (i % 4) == 0 ) then 
-			colorObjectCyan(block);
-		elseif ( (i % 4) == 1 ) then
-			colorObjectOrange(block);
-		elseif ( (i % 4) == 2 ) then
-			colorObjectGreen(block);
-		else -- ( (i % 4) == 3 ) then 
-			colorObjectPurple(block);
-		end
-		physics.addBody(block, "static");
-		block.isSensor = true;
-		game:insert(block);
-		block.name = "testObs_" .. i;
-		moveBackAndForthForever(block);
-	end
-	blockX = - 300 - display.contentWidth + display.contentWidth/8 ;
-	testObsY = testObsY - 50;
-	for i = 21 , 32 do
-		local block = display.newRect(blockX, testObsY, display.contentWidth/4.0, 50);
-		blockX = blockX + display.contentWidth/4.0;
-		if ( (i % 4) == 0 ) then 
-			colorObjectCyan(block);
-		elseif ( (i % 4) == 1 ) then
-			colorObjectOrange(block);
-		elseif ( (i % 4) == 2 ) then
-			colorObjectGreen(block);
-		else -- ( (i % 4) == 3 ) then 
-			colorObjectPurple(block);
-		end
-		physics.addBody(block, "static");
-		block.isSensor = true;
-		game:insert(block);
-		block.name = "testObs_" .. i;
-		moveBackAndForthForever(block);
-	end
+	testObsY = addSingleLineObs(testObsY);
+	testObsY = addSingleLineObs(testObsY)
+	testObsY = addMultiLineObs(testObsY);
+
 
 	-- for obsNum = 1, numTestObs do
 		-- local randInd = math.random(1, #testObs);
