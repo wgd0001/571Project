@@ -4,8 +4,10 @@
 --
 -- Scene template from Corona SDK documentation
 --
+
 local composer = require( "composer" )
 local physics = require( "physics" ) 
+-- physics.setDrawMode( 'hybrid' )
 physics.start()
 physics.setGravity( 0, display.contentHeight / 25.0 )
 
@@ -29,21 +31,33 @@ local obsNum = 0;
 local function colorObjectCyan( object ) 
 	object:setFillColor(0,1,1);
 	object.colorTag = "cyan";
+	object.r = 0;
+	object.g = 1;
+	object.b = 1;
 end
 
 local function colorObjectPurple( object ) 
 	object:setFillColor(0.627451, 0.12549, 0.941176)
 	object.colorTag = "purple";
+	object.r = 0.627451;
+	object.g = 0.12549;
+	object.b = 0.941176;
 end
 
 local function colorObjectOrange( object )
 	object:setFillColor(1, 0.647059, 0)
 	object.colorTag = "orange";
+	object.r = 1;
+	object.g = 0.647059;
+	object.b = 0;
 end
 
 local function colorObjectGreen( object )
 	object:setFillColor(0.498039, 1, 0)
 	object.colorTag = "green";
+	object.r = 0.498039;
+	object.g = 1;
+	object.b = 0;
 end
 
 local function colorObject( object )
@@ -125,14 +139,14 @@ end
 
 local function screenTap ( event )
 	if ( gameStarted == false ) then -- leaving ball stationary until first tap
-		physics.addBody (playerBall, "dynamic", { density=-.5, friction=0.0, bounce=0.2, radius=30 });
+		physics.addBody (playerBall, "dynamic", { density=-.5, friction=0.0, bounce=0.2, radius=display.contentWidth / 35.0 });
 		gameStarted = true;
 	end
 	
 	local delta = top.y - playerBall.y;
 	--print(delta, delta/100)
 	-- playerBall:applyForce(0,-25, playerBall.x, playerBall.y);
-	playerBall:applyForce(0, delta/35, playerBall.x, playerBall.y);
+	playerBall:applyForce(0, delta/75, playerBall.x, playerBall.y);
 end
 
 local function moveView()
@@ -178,6 +192,251 @@ end
 
 function moveBackAndForthForever( object ) 
 	moveRight(object);
+end
+
+function addSpinningDiamondObs(testObsY)
+	local diamondVerts = {-13,-17, 0,55, 13,-17, 0,-55};
+	local ax = 0.5
+    local ay = 1
+    local sx, xy;
+
+    --======================
+	-- add first pinwheel
+	--======================
+
+	local xOffset = -115;
+
+	-- make sure at least one diamond is the color of the ball
+	-- just in case we add more colors...
+	local randIndex = math.random(4);
+
+	-- diamond 1 (top)
+	local diamond1 = display.newPolygon(display.contentWidth/2.+xOffset, testObsY, diamondVerts);
+	diamond1.name = "testObs_spinWheel1_diamond1";
+	sx, sy = diamond1:localToContent( diamond1.width*ax, diamond1.height*ay )
+   	diamond1.anchorX = ax
+   	diamond1.anchorY = ay
+   	diamond1.x = sx - (diamond1.width/2)
+   	diamond1.y = sy - (diamond1.height/2)
+	
+   	if(randIndex == 1) then
+   		diamond1:setFillColor(playerBall.r, playerBall.g, playerBall.b);
+		diamond1.colorTag = playerBall.colorTag;
+		diamond1.r = playerBall.r;
+		diamond1.g = playerBall.g;
+		diamond1.b = playerBall.b;
+   	else
+   		colorObject(diamond1);
+   	end
+
+	game:insert(diamond1);
+	physics.addBody( diamond1, "kinematic", {isSensor=true})
+	diamond1.angularVelocity = 50;
+
+	-- diamond 2 (bottom)
+	local diamond2 = display.newPolygon(display.contentWidth/2.+xOffset, testObsY, diamondVerts);
+	diamond2.name = "testObs_spinWheel1_diamond2";
+	sx, sy = diamond2:localToContent( diamond2.width*ax, diamond2.height*ay )
+   	diamond2.anchorX = ax
+   	diamond2.anchorY = ay
+   	diamond2.x = sx - (diamond2.width/2)
+   	diamond2.y = sy - (diamond2.height/2)
+
+   	if(randIndex == 2) then
+   		diamond2:setFillColor(playerBall.r, playerBall.g, playerBall.b);
+		diamond2.colorTag = playerBall.colorTag;
+		diamond2.r = playerBall.r;
+		diamond2.g = playerBall.g;
+		diamond2.b = playerBall.b;
+   	else
+   		colorObject(diamond2);
+   	end
+
+	game:insert(diamond2);
+	physics.addBody( diamond2, "kinematic", {isSensor=true})
+	diamond2.rotation = 180;
+	diamond2.angularVelocity = 50;
+
+	-- diamond 3 (left)
+	local diamond3 = display.newPolygon(display.contentWidth/2.+xOffset, testObsY, diamondVerts);
+	diamond3.name = "testObs_spinWheel1_diamond3";
+	sx, sy = diamond3:localToContent( diamond3.width*ax, diamond3.height*ay )
+   	diamond3.anchorX = ax
+   	diamond3.anchorY = ay
+   	diamond3.x = sx - (diamond3.width/2)
+   	diamond3.y = sy - (diamond3.height/2)
+
+   	if(randIndex == 3) then
+   		diamond3:setFillColor(playerBall.r, playerBall.g, playerBall.b);
+		diamond3.colorTag = playerBall.colorTag;
+		diamond3.r = playerBall.r;
+		diamond3.g = playerBall.g;
+		diamond3.b = playerBall.b;
+   	else
+   		colorObject(diamond3);
+   	end
+
+	game:insert(diamond3);
+	physics.addBody( diamond3, "kinematic", {isSensor=true})
+	diamond3.rotation = -90;
+	diamond3.angularVelocity = 50;
+
+	-- diamond 4 (right)
+	local diamond4 = display.newPolygon(display.contentWidth/2.+xOffset, testObsY, diamondVerts);
+	diamond4.name = "testObs_spinWheel1_diamond4";
+	sx, sy = diamond4:localToContent( diamond4.width*ax, diamond4.height*ay )
+   	diamond4.anchorX = ax
+   	diamond4.anchorY = ay
+   	diamond4.x = sx - (diamond4.width/2)
+   	diamond4.y = sy - (diamond4.height/2)
+
+   	if(randIndex == 4) then
+   		diamond4:setFillColor(playerBall.r, playerBall.g, playerBall.b);
+		diamond4.colorTag = playerBall.colorTag;
+		diamond4.r = playerBall.r;
+		diamond4.g = playerBall.g;
+		diamond4.b = playerBall.b;
+   	else
+   		colorObject(diamond4);
+   	end
+
+	game:insert(diamond4);
+	physics.addBody( diamond4, "kinematic", {isSensor=true})
+	diamond4.rotation = 90;
+	diamond4.angularVelocity = 50;
+
+
+	--======================
+	-- add second pinwheel
+	--======================
+
+	local xOffset = 115;
+
+	-- need to randomly make sure at least one way to get through
+	-- randIndex = math.random(4);
+	local prevDiamonds = {diamond1, diamond2, diamond3, diamond4};
+	local randDiamond = prevDiamonds[randIndex];
+	print("randDiamond " .. randIndex, randDiamond)
+
+	-- diamond 1 (top)
+	local diamond1 = display.newPolygon(display.contentWidth/2.+xOffset, testObsY, diamondVerts);
+	diamond1.name = "testObs_spinWheel2_diamond1";
+	sx, sy = diamond1:localToContent( diamond1.width*ax, diamond1.height*ay )
+   	diamond1.anchorX = ax
+   	diamond1.anchorY = ay
+   	diamond1.x = sx - (diamond1.width/2)
+   	diamond1.y = sy - (diamond1.height/2)
+   	
+   	if(randIndex == 1) then
+   		diamond1:setFillColor(randDiamond.r, randDiamond.g, randDiamond.b);
+		diamond1.colorTag = randDiamond.colorTag;
+		diamond2.r = playerBall.r;
+		diamond2.g = playerBall.g;
+		diamond2.b = playerBall.b;
+   	else
+   		colorObject(diamond1);
+   	end
+
+	game:insert(diamond1);
+	physics.addBody( diamond1, "kinematic", {isSensor=true})
+	diamond1.angularVelocity = -50;
+
+	-- diamond 2 (bottom)
+	local diamond2 = display.newPolygon(display.contentWidth/2.+xOffset, testObsY, diamondVerts);
+	diamond2.name = "testObs_spinWheel2_diamond2";
+	sx, sy = diamond2:localToContent( diamond2.width*ax, diamond2.height*ay )
+   	diamond2.anchorX = ax
+   	diamond2.anchorY = ay
+   	diamond2.x = sx - (diamond2.width/2)
+   	diamond2.y = sy - (diamond2.height/2)
+	
+	if(randIndex == 2) then
+   		diamond2:setFillColor(randDiamond.r, randDiamond.g, randDiamond.b);
+		diamond2.colorTag = randDiamond.colorTag;
+		diamond2.r = playerBall.r;
+		diamond2.g = playerBall.g;
+		diamond2.b = playerBall.b;
+   	else
+   		colorObject(diamond2);
+   	end
+
+	game:insert(diamond2);
+	physics.addBody( diamond2, "kinematic", {isSensor=true})
+	diamond2.rotation = 180;
+	diamond2.angularVelocity = -50;
+
+	-- diamond 3 (left)
+	local diamond3 = display.newPolygon(display.contentWidth/2.+xOffset, testObsY, diamondVerts);
+	diamond3.name = "testObs_spinWheel2_diamond3";
+	sx, sy = diamond3:localToContent( diamond3.width*ax, diamond3.height*ay )
+   	diamond3.anchorX = ax
+   	diamond3.anchorY = ay
+   	diamond3.x = sx - (diamond3.width/2)
+   	diamond3.y = sy - (diamond3.height/2)
+	
+   	if(randIndex == 4) then
+   		diamond3:setFillColor(randDiamond.r, randDiamond.g, randDiamond.b);
+		diamond3.colorTag = randDiamond.colorTag;
+		diamond3.r = playerBall.r;
+		diamond3.g = playerBall.g;
+		diamond3.b = playerBall.b;
+   	else
+   		colorObject(diamond3);
+   	end
+
+	game:insert(diamond3);
+	physics.addBody( diamond3, "kinematic", {isSensor=true})
+	diamond3.rotation = -90;
+	diamond3.angularVelocity = -50;
+
+	-- diamond 4 (right)
+	local diamond4 = display.newPolygon(display.contentWidth/2.+xOffset, testObsY, diamondVerts);
+	diamond4.name = "testObs_spinWheel2_diamond4";
+	sx, sy = diamond4:localToContent( diamond4.width*ax, diamond4.height*ay )
+   	diamond4.anchorX = ax
+   	diamond4.anchorY = ay
+   	diamond4.x = sx - (diamond4.width/2)
+   	diamond4.y = sy - (diamond4.height/2)
+
+   	if(randIndex == 3) then
+   		diamond4:setFillColor(randDiamond.r, randDiamond.g, randDiamond.b);
+		diamond4.colorTag = randDiamond.colorTag;
+		diamond4.r = playerBall.r;
+		diamond4.g = playerBall.g;
+		diamond4.b = playerBall.b;
+   	else
+   		colorObject(diamond4);
+   	end
+
+	game:insert(diamond4);
+	physics.addBody( diamond4, "kinematic", {isSensor=true})
+	diamond4.rotation = 90;
+	diamond4.angularVelocity = -50;
+
+	return testObsY - 400;
+end
+
+function addColorChanger2(testObsY)
+	local vertices = { 0,-110, 27,-35, 105,-35, 43,16, 65,90, 0,45, -65,90, -43,15, -105,-35, -27,-35, }
+
+	local colorChanger = display.newPolygon( display.contentWidth/2., testObsY, vertices )
+	colorChanger.name = "colorChanger";
+	colorChanger.xScale = .5;
+	colorChanger.yScale = .5;
+	colorChanger.strokeWidth = 5
+	colorChanger:setStrokeColor( 1, 0, 0 )
+	physics.addBody( colorChanger, "static", {density=3, isSensor=true})
+	game:insert(colorChanger);
+
+	timer.performWithDelay(
+		10,
+		function()
+			colorChanger.rotation = colorChanger.rotation + 1;
+		end,
+		0
+	);
+
+	return testObsY - 400;
 end
 
 local function addColorChanger(testObsY)
@@ -340,6 +599,8 @@ local function addSomeTestObstacles()
 	local numTestObs = 10;
 	local testObsY = 300;
 
+	testObsY = addSpinningDiamondObs(testObsY);
+	testObsY = addColorChanger2(testObsY);
 	testObsY = addColorChanger(testObsY);
 	testObsY = addSingleLineObs(testObsY);
 	testObsY = addSingleLineObs(testObsY)
