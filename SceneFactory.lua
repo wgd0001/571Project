@@ -66,6 +66,7 @@ end
 
 local function reset()
 	physics.removeBody(playerBall);
+	playerBall.x = display.contentWidth/2.0;
 	playerBall.y = display.contentHeight-150;
 	game.y = 0;
 	bottom.y = display.contentHeight-20;
@@ -93,6 +94,7 @@ local function explode ( event )
 		physics.addBody(circle, "dynamic", { density=-.5, friction=0.0, bounce=1, radius=radius });
 		circle:applyForce(math.random(3, 5), 0, x, y);
 		circle.name = "garbage"
+		game:insert(circle);
 	end
 end
 
@@ -100,6 +102,8 @@ local function ballCollision ( event )
 	if (event.phase=="began" and event.other.name ~= nil) then
 		if(event.other.name == "bottom" ) then
 			gameOver();
+		elseif (event.other.name == "colorChanger") then
+			colorObject(playerBall);
 		elseif ( event.name == "garbage" or event.other.name == "garbage") then
 			-- no op
 		elseif(string.find(event.other.name, "testObs_") ~= nil) then
@@ -174,6 +178,30 @@ end
 
 function moveBackAndForthForever( object ) 
 	moveRight(object);
+end
+
+local function addColorChanger(testObsY)
+	local colorChangerImage = "colorChanger.png"
+	local colorChanger_outline = graphics.newOutline( 2, colorChangerImage )
+	local colorChanger = display.newImageRect( colorChangerImage, 32, 32 )
+	colorChanger.name = "colorChanger";
+	colorChanger.xScale = 2;
+	colorChanger.yScale = 2;
+	colorChanger.x = display.contentWidth / 2.;
+	colorChanger.y = testObsY;
+	physics.addBody( colorChanger, "static", { outline=colorChanger_outline } )
+	colorChanger.isSensor = true;
+	game:insert(colorChanger);
+
+	timer.performWithDelay(
+		10,
+		function()
+			colorChanger.rotation = colorChanger.rotation + 1;
+		end,
+		0
+	);
+
+	return testObsY - 400;
 end
 
 local function addMultiLineObs(testObsY)
@@ -311,7 +339,8 @@ local function addSomeTestObstacles()
 	local testObs = {"box", "circle", "rect"};
 	local numTestObs = 10;
 	local testObsY = 300;
-	
+
+	testObsY = addColorChanger(testObsY);
 	testObsY = addSingleLineObs(testObsY);
 	testObsY = addSingleLineObs(testObsY)
 	testObsY = addMultiLineObs(testObsY);
