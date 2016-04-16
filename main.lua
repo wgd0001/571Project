@@ -3,6 +3,6 @@ local physics = require ("physics");
 physics.start();
 
 local composer = require( "composer" );
-local options = {effect="fade", time=1000, params={lives=1}}
+local options = {effect="fade", time=1000}
 
-composer.gotoScene( "SceneFactory", options);
+composer.gotoScene( "startScene", options);

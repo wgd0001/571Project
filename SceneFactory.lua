@@ -731,6 +731,9 @@ function scene:show( event )
 		updateScore();
 
 		addObstacles();
+		
+		Runtime:addEventListener( "tap", screenTap );
+		Runtime:addEventListener( "enterFrame", moveView );
     end
 end
 
@@ -769,8 +772,6 @@ scene:addEventListener( "create", scene )
 scene:addEventListener( "show", scene )
 scene:addEventListener( "hide", scene )
 scene:addEventListener( "destroy", scene )
-Runtime:addEventListener( "tap", screenTap );
-Runtime:addEventListener( "enterFrame", moveView );
 
 -- -------------------------------------------------------------------------------
 
