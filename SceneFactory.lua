@@ -174,6 +174,7 @@ local function ballCollision ( event )
 				colorObject(playerBall);
 			end
 			event.other.used = true;
+			event.other:setFillColor(0.15, 0.15, 0.15); -- look "used"
 			score = score + 1;
 			updateScore();
 		elseif ( event.name == "garbage" or event.other.name == "garbage") then
@@ -212,7 +213,7 @@ local function moveView()
 		--print("top", top.y)
 		-- print(game.topBounds);
 		local delta = playerBall.y - top.y;
-		if(delta < 500 and playerBall.y > -5000) then
+		if(delta < 500 and playerBall.y > -10000) then
 			top.y = top.y - 10;
 			game.y = game.y + 10;
 			bottom.y = bottom.y - 10;
@@ -668,14 +669,28 @@ local function addObstacles()
 
 	--obsY = addRotatingSquare(obsY); -- Has problem 
 	obsY = addSpinningDiamondObs(obsY);
-	--obsY = addColorChanger2(obsY);
 	obsY = addColorChanger(obsY);
 	obsY = addLinesWithSpaceObs(obsY);
 	obsY = addColorChanger(obsY);
+	obsY = addSpinningDiamondObs(obsY);
 	obsY = addSingleLineObs(obsY);
+	obsY = addColorChanger(obsY);
 	obsY = addSingleLineObs(obsY)
 	obsY = addColorChanger(obsY);
-	obsY = addMultiLineObs(obsY);
+	obsY = addLinesWithSpaceObs(obsY);
+	obsY = addLinesWithSpaceObs(obsY);
+	obsY = addSingleLineObs(obsY);
+	obsY = addColorChanger(obsY);
+	obsY = addLinesWithSpaceObs(obsY);
+	obsY = addLinesWithSpaceObs(obsY+250);
+	obsY = addLinesWithSpaceObs(obsY+250);
+	obsY = addSpinningDiamondObs(obsY);
+	obsY = addSpinningDiamondObs(obsY +250);
+	obsY = addColorChanger(obsY);
+	obsY = addSpinningDiamondObs(obsY);
+	obsY = addSpinningDiamondObs(obsY +250);
+	obsY = addSpinningDiamondObs(obsY +250);
+
 end
 
 
