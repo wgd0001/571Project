@@ -22,6 +22,8 @@ local top = nil;
 -- -----------------------------------------------------------------------------------------------------------------
 
 -- Globals
+local difficulty;
+local obsSpace;
 local playerBall = nil;
 local gameStarted = false;
 local deadMeat = false;
@@ -31,6 +33,7 @@ local obsNum = 0;
 local score = 0;
 local scoreTextInit = false;
 local scoreText;
+local difficultyText;
 
 -- Colors here are from http://www.avatar.se/molscript/doc/colour_names.html
 local function colorObjectCyan( object ) 
@@ -132,11 +135,12 @@ end
 local function updateScore()
 	if ( scoreTextInit == true ) then 
 		scoreText:removeSelf();
+		difficultyText:removeSelf();
 	end
 	
 	local scoreTextOpt = 
 	{
-		text = "  Score : " .. score .. "   ",     
+		text = "  Score : " .. score,     
 		x = display.contentWidth / 2.0 ,
 		y = 0 + 50,
 		width = display.contentWidth,    
@@ -147,7 +151,24 @@ local function updateScore()
 	}
 	scoreText = display.newText(scoreTextOpt);
 	scoreText:setFillColor(1,1,1);
+	
+	local difficultyTextOpt = 
+	{
+		text = "Mode : " .. difficulty .. "  " ,     
+		x = display.contentWidth / 2.0 ,
+		y = 0 + 50,
+		width = display.contentWidth,    
+		height = 50;
+		font = native.systemFontBold,   
+		fontSize = 48,
+		align = "right" 
+	}
+	difficultyText = display.newText(difficultyTextOpt);
+	difficultyText:setFillColor(1,1,1);
+
 	scoreTextInit = true;
+	
+	
 end
 
 local function explode ( event )
@@ -258,6 +279,8 @@ function addSpinningDiamondObs(obsY)
 	local ax = 0.5
     local ay = 1
     local sx, xy;
+	
+	obsY = obsY - 50;
 
     --======================
 	-- add first pinwheel
@@ -408,7 +431,7 @@ function addSpinningDiamondObs(obsY)
 	diamond4.rotation = 90;
 	diamond4.angularVelocity = -50;
 
-	return obsY - 400;
+	return obsY - obsSpace;
 end
 
 function addColorChanger2(obsY)
@@ -432,7 +455,7 @@ function addColorChanger2(obsY)
 		0
 	);
 
-	return obsY - 400;
+	return obsY - obsSpace;
 end
 
 local function addColorChanger(obsY)
@@ -457,7 +480,7 @@ local function addColorChanger(obsY)
 		0
 	);
 
-	return obsY - 400;
+	return obsY - obsSpace;
 end
 
 local function addMultiLineObs(obsY)
@@ -550,7 +573,7 @@ local function addMultiLineObs(obsY)
 		);
 	end
 
-	return obsY - 400;
+	return obsY - obsSpace;
 end
 
 local function addSingleLineObs(obsY)
@@ -588,7 +611,7 @@ local function addSingleLineObs(obsY)
 			1
 		);	end
 	
-	return obsY - 400;
+	return obsY - obsSpace;
 end
 
 local function addLinesWithSpaceObs( obsY ) 
@@ -633,7 +656,7 @@ local function addLinesWithSpaceObs( obsY )
 			1
 		);	end
 	
-	return obsY - 500;
+	return obsY - obsSpace - 100;
 end
 
 local function addRotatingSquare( obsY )
@@ -661,7 +684,120 @@ local function addRotatingSquare( obsY )
 	bottom.angularVelocity = -50;
 	
 
-	return obsY - 400;
+	return obsY - obsSpace;
+end
+
+local function addObstaclesEasy()
+	local obsY = 300;
+	local lastWasColorChanger = true;
+
+	while ( obsY > -5000 ) do
+		local rand = math.random();
+		
+		if ( rand < 0.35 ) then 
+			if ( lastWasColorChanger ~= true ) then
+				obsY = addColorChanger(obsY);
+				lastWasColorChanger = true;
+			end
+		elseif ( rand < 0.5 ) then
+			lastWasColorChanger = false;
+			obsY = addLinesWithSpaceObs(obsY);
+		elseif ( rand < 0.75 ) then
+			lastWasColorChanger = false;
+			obsY = addSpinningDiamondObs(obsY);
+		elseif ( rand < 0.85 ) then 
+			lastWasColorChanger = false;
+			obsY = addSingleLineObs(obsY);
+		else -- ( rand > 0.85 ) then 
+			lastWasColorChanger = false;
+			obsY = addSingleLineObs(obsY);
+			obsY = addSingleLineObs(obsY - obsSpace / 2.0);
+		end
+	end
+end
+
+local function addObstaclesNormal()
+	local obsY = 300;
+	local lastWasColorChanger = true;
+
+	while ( obsY > -5000 ) do
+		local rand = math.random();
+		
+		if ( rand < 0.20 ) then 
+			if ( lastWasColorChanger ~= true ) then
+				obsY = addColorChanger(obsY);
+				lastWasColorChanger = true;
+			end
+		elseif ( rand < 0.25 ) then
+			lastWasColorChanger = false;
+			obsY = addLinesWithSpaceObs(obsY);
+		elseif ( rand < 0.50 ) then
+			lastWasColorChanger = false;
+			obsY = addSpinningDiamondObs(obsY);
+		elseif ( rand < 0.75 ) then 
+			lastWasColorChanger = false;
+			obsY = addSingleLineObs(obsY);
+		elseif ( rand < 0.85 ) then 
+			lastWasColorChanger = false;
+			obsY = addSingleLineObs(obsY);
+			obsY = addSingleLineObs(obsY - obsSpace / 2.0);
+		elseif ( rand < 0.95 ) then
+			lastWasColorChanger = false;
+			obsY = addMultiLineObs(obsY);
+		else -- ( rand > 0.95 ) then 
+			lastWasColorChanger = false;
+			obsY = addSpinningDiamondObs(obsY);
+			obsY = addSpinningDiamondObs(obsY - 100);
+			obsY = addSpinningDiamondObs(obsY - 100);
+		end
+	end
+end
+
+local function addObstaclesHard()
+	local obsY = 300;
+	local lastWasColorChanger = true;
+
+	while ( obsY > -5000 ) do
+		local rand = math.random();
+		
+		if ( rand < 0.10 ) then 
+			if ( lastWasColorChanger ~= true ) then
+				obsY = addColorChanger(obsY);
+				lastWasColorChanger = true;
+			end
+		elseif ( rand < 0.15 ) then
+			lastWasColorChanger = false;
+			obsY = addLinesWithSpaceObs(obsY);
+		elseif ( rand < 0.30 ) then
+			lastWasColorChanger = false;
+			obsY = addSpinningDiamondObs(obsY);
+		elseif ( rand < 0.50 ) then 
+			lastWasColorChanger = false;
+			obsY = addSingleLineObs(obsY);
+		elseif ( rand < 0.65 ) then 
+			lastWasColorChanger = false;
+			obsY = addSingleLineObs(obsY);
+			obsY = addSingleLineObs(obsY - obsSpace / 2.0);
+		elseif ( rand < 0.75 ) then
+			lastWasColorChanger = false;
+			obsY = addMultiLineObs(obsY);
+		elseif ( rand < 0.85 ) then 
+			lastWasColorChanger = false;
+			obsY = addSpinningDiamondObs(obsY);
+			obsY = addSpinningDiamondObs(obsY - 100);
+			obsY = addSpinningDiamondObs(obsY - 100);
+		elseif ( rand < 0.95 ) then 
+			lastWasColorChanger = false;
+			obsY = addMultiLineObs(obsY);
+			obsY = addMultiLineObs(obsY-100);
+			obsY = addMultiLineObs(obsY-100);
+			obsY = addMultiLineObs(obsY-100);
+		else -- ( rand > 0.95 ) then 
+			lastWasColorChanger = false;
+			obsY = addMultiLineObs(obsY);
+			obsY = addMultiLineObs(obsY-100);
+		end
+	end
 end
 
 local function addObstacles()
@@ -705,6 +841,7 @@ function scene:show( event )
     elseif ( phase == "did" ) then
         -- Called when the scene is now on screen
 		
+		
 		local BoxLineWidth = 2;
 		top = display.newRect(0,0,display.contentWidth, 20);
 		bottom = display.newRect(0,display.contentHeight-20,display.contentWidth, 20);
@@ -728,10 +865,22 @@ function scene:show( event )
 		colorObject(playerBall);
 		game:insert(playerBall);
 
+		difficulty = event.params.mode;
+		print ("Difficulty - " .. difficulty);
+		
+		if ( difficulty == "Easy" ) then 
+			obsSpace = 400;
+			addObstaclesEasy();
+		elseif ( difficulty == "Normal" ) then
+			obsSpace = 300;
+			addObstaclesNormal();
+		else -- ( difficulty == "Hard" ) then
+			obsSpace = 200;
+			addObstaclesHard();
+		end
+
 		updateScore();
 
-		addObstacles();
-		
 		Runtime:addEventListener( "tap", screenTap );
 		Runtime:addEventListener( "enterFrame", moveView );
     end
