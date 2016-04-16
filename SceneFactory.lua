@@ -169,7 +169,10 @@ local function ballCollision ( event )
 			gameOver();
 		elseif (event.other.name == "colorChanger" and 
 		        event.other.used == false ) then
-			colorObject(playerBall);
+			local currentColor = playerBall.colorTag
+			while (currentColor == playerBall.colorTag ) do
+				colorObject(playerBall);
+			end
 			event.other.used = true;
 			score = score + 1;
 			updateScore();
