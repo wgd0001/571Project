@@ -66,7 +66,7 @@ function scene:show( event )
 		x = display.contentWidth / 2.0 ,
 		y = 50,
 		width = display.contentWidth,    
-		height = 60;
+		height = 70;
 		font = native.systemFontBold,   
 		fontSize = 56,
 		align = "center" 
@@ -108,7 +108,7 @@ function scene:show( event )
 		x = display.contentWidth / 2.0 ,
 		y = display.contentHeight / 2.0,
 		width = display.contentWidth,    
-		height = 60;
+		height = 70;
 		font = native.systemFontBold,   
 		fontSize = 56,
 		align = "left" 
