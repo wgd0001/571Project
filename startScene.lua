@@ -80,7 +80,7 @@ function scene:show( event )
 		x = display.contentWidth / 2.0 ,
 		y = 150,
 		width = display.contentWidth,    
-		height = 50;
+		height = 60;
 		font = native.systemFontBold,   
 		fontSize = 48,
 		align = "center" 
