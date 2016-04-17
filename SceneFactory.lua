@@ -29,6 +29,8 @@ local gameStarted = false;
 local deadMeat = false;
 local DelaySwap = false;
 local obsNum = 0;
+local obsTimers = {};
+local numObsTimers = 1;
 
 local score = 0;
 local scoreTextInit = false;
@@ -229,6 +231,15 @@ local function screenTap ( event )
 	playerBall:applyForce(0, delta/75, playerBall.x, playerBall.y);
 end
 
+local function checkWinner()
+	if(playerBall.y < -5500) then
+		physics.stop();
+		local options = {effect="fade", time=500}
+		composer.removeScene("SceneFactory", false);
+		composer.gotoScene( "winScreen", options);
+	end
+end
+
 local function moveView()
 	if(playerBall ~= nil) then
 		--print("top", top.y)
@@ -239,6 +250,8 @@ local function moveView()
 			game.y = game.y + 10;
 			bottom.y = bottom.y - 10;
 		end
+
+		checkWinner();
 	end
 end
 
@@ -447,13 +460,14 @@ function addColorChanger2(obsY)
 	physics.addBody( colorChanger, "static", {density=3, isSensor=true})
 	game:insert(colorChanger);
 
-	timer.performWithDelay(
+	obsTimers[numObsTimers] = timer.performWithDelay(
 		10,
 		function()
 			colorChanger.rotation = colorChanger.rotation + 1;
 		end,
 		0
 	);
+	numObsTimers = numObsTimers + 1;
 
 	return obsY - obsSpace;
 end
@@ -472,13 +486,14 @@ local function addColorChanger(obsY)
 	colorChanger.isSensor = true;
 	game:insert(colorChanger);
 
-	timer.performWithDelay(
+	obsTimers[numObsTimers] = timer.performWithDelay(
 		10,
 		function()
 			colorChanger.rotation = colorChanger.rotation + 1;
 		end,
 		0
 	);
+	numObsTimers = numObsTimers + 1;
 
 	return obsY - obsSpace;
 end
@@ -510,13 +525,14 @@ local function addMultiLineObs(obsY)
 		game:insert(block);
 		block.name = "testObs_" .. obsNum;
 		obsNum = obsNum + 1;
-		timer.performWithDelay(
+		obsTimers[numObsTimers] = timer.performWithDelay(
 			waitTime,
 			function()
 				moveBackAndForthForever(block);
 			end,
 			1
 		);
+		numObsTimers = numObsTimers + 1;
 	end
 	blockX = - 150 - display.contentWidth + display.contentWidth/8 ;
 	obsY = obsY - 50;
@@ -537,13 +553,14 @@ local function addMultiLineObs(obsY)
 		game:insert(block);
 		block.name = "testObs_" .. obsNum;
 		obsNum = obsNum + 1;
-		timer.performWithDelay(
+		obsTimers[numObsTimers] = timer.performWithDelay(
 			waitTime,
 			function()
 				moveBackAndForthForever(block);
 			end,
 			1
 		);
+		numObsTimers = numObsTimers + 1;
 	end
 	blockX = - 300 - display.contentWidth + display.contentWidth/8 ;
 	obsY = obsY - 50;
@@ -564,13 +581,14 @@ local function addMultiLineObs(obsY)
 		game:insert(block);
 		block.name = "testObs_" .. obsNum;
 		obsNum = obsNum + 1;
-		timer.performWithDelay(
+		obsTimers[numObsTimers] = timer.performWithDelay(
 			waitTime,
 			function()
 				moveBackAndForthForever(block);
 			end,
 			1
 		);
+		numObsTimers = numObsTimers + 1;
 	end
 
 	return obsY - obsSpace;
@@ -603,13 +621,15 @@ local function addSingleLineObs(obsY)
 		game:insert(block);
 		block.name = "testObs_" .. obsNum;
 		obsNum = obsNum + 1;
-		timer.performWithDelay(
+		obsTimers[numObsTimers] = timer.performWithDelay(
 			waitTime,
 			function()
 				moveBackAndForthForever(block);
 			end,
 			1
-		);	end
+		);
+		numObsTimers = numObsTimers + 1;
+	end
 	
 	return obsY - obsSpace;
 end
@@ -648,13 +668,15 @@ local function addLinesWithSpaceObs( obsY )
 		game:insert(block);
 		block.name = "testObs_" .. obsNum;
 		obsNum = obsNum + 1;
-		timer.performWithDelay(
+		obsTimers[numObsTimers] = timer.performWithDelay(
 			waitTime,
 			function()
 				moveBackAndForthForever(block);
 			end,
 			1
-		);	end
+		);
+		numObsTimers = numObsTimers + 1;
+	end
 	
 	return obsY - obsSpace - 100;
 end
@@ -829,6 +851,47 @@ local function addObstacles()
 
 end
 
+local function addFinishLine()
+	local finishLine = display.newGroup();
+	local xBoxes = 30;
+	local yBoxes = 30;
+	-- the size of each box in the x-direction (width)
+	local sizeX = display.contentWidth / xBoxes;
+	-- the size of each box in the y-direction (height)
+	local sizeY = display.contentHeight / yBoxes;
+
+	local boxNum = 1;
+	-- loop over our screen size in both directions
+	for i = 0, xBoxes-1 do
+		for j = 0, 2 do
+			-- decide where to place the box
+			xLoc = sizeX * i + sizeX / 2;
+			yLoc = sizeY * j + sizeY / 2;
+
+			-- create the box
+			box = display.newRect(xLoc, yLoc, sizeX, sizeY);
+			-- add this box to our group
+			finishLine:insert(box);
+			-- set the box stroke width
+			box.strokeWidth = 3;
+			-- set the box stroke color to black (don't expect random color of exactly black)
+			box:setStrokeColor(0, 0, 0);
+			-- using assigned rgb values, set the box fill color
+			if(boxNum % 2 == 0) then
+				box:setFillColor(0, 0, 0);
+			else
+				box:setFillColor(1, 1, 1);
+			end
+
+			-- increment our index
+			boxNum = boxNum + 1;
+		end
+	end
+
+	finishLine.x = 0;
+	finishLine.y = -5500;
+	game:insert(finishLine);
+end
 
 -- "scene:show()"
 function scene:show( event )
@@ -840,7 +903,7 @@ function scene:show( event )
         -- Called when the scene is still off screen (but is about to come on screen)
     elseif ( phase == "did" ) then
         -- Called when the scene is now on screen
-		
+		addFinishLine();
 		
 		local BoxLineWidth = 2;
 		top = display.newRect(0,0,display.contentWidth, 20);
@@ -911,6 +974,15 @@ function scene:destroy( event )
     -- Called prior to the removal of scene's view
     -- Insert code here to clean up the scene
     -- Example: remove display objects, save state, etc.
+	for i=1,numObsTimers-1 do
+        timer.cancel(obsTimers[i]);
+    end
+
+	Runtime:removeEventListener( "tap", screenTap );
+	Runtime:removeEventListener( "enterFrame", moveView );
+    game:removeSelf();
+    scoreText:removeSelf();
+	difficultyText:removeSelf();
 end
 
 

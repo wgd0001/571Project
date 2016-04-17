@@ -21,18 +21,21 @@ local hardButtonText = nil;
 
 local function startEasyMode()
 	print ("easy...");
+	composer.removeScene("startScene", false);
 	local options = {effect="fade", time=1000, params={mode="Easy"}}
 	composer.gotoScene( "SceneFactory", options);
 end
 
 local function startNormalMode()
 	print ("Normal");
+	composer.removeScene("startScene", false);
 	local options = {effect="fade", time=1000, params={mode="Normal"}}
 	composer.gotoScene( "SceneFactory", options);
 end
 
 local function startHardMode()
 	print ("Hard!");
+	composer.removeScene("startScene", false);
 	local options = {effect="fade", time=1000, params={mode="Hard"}}
 	composer.gotoScene( "SceneFactory", options);
 end
@@ -191,7 +194,16 @@ function scene:hide( event )
       -- Example: stop timers, stop animation, stop audio, etc.
    elseif ( phase == "did" ) then
       -- Called immediately after scene goes off screen.
-	nameText:removeSelf();
+   end
+end
+
+-- "scene:destroy()"
+function scene:destroy( event )
+   local sceneGroup = self.view
+   -- Called prior to the removal of scene's view ("sceneGroup").
+   -- Insert code here to clean up the scene.
+   -- Example: remove display objects, save state, etc.
+   	nameText:removeSelf();
 	classText:removeSelf();
 	authorText:removeSelf();
 	selectLevelText:removeSelf();
@@ -202,16 +214,6 @@ function scene:hide( event )
 	normalButtonText:removeSelf();
 	hardButton:removeSelf();
 	hardButtonText:removeSelf();
-   end
-end
-
--- "scene:destroy()"
-function scene:destroy( event )
-
-   local sceneGroup = self.view
-   -- Called prior to the removal of scene's view ("sceneGroup").
-   -- Insert code here to clean up the scene.
-   -- Example: remove display objects, save state, etc.
 end
 
 ---------------------------------------------------------------------------------
