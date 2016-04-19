@@ -25,6 +25,7 @@ local scene = composer.newScene()
 local youWinText = nil;
 local playAgainButton = nil; 
 local playAgainText = nil;
+local creditText = nil;
 
 -- function: playAgain()
 -- input: na
@@ -69,7 +70,7 @@ function scene:show( event )
 	{
 		text = "YOU WIN!!",     
 		x = display.contentWidth / 2.0 ,
-		y = display.contentHeight / 2.0 - 100,
+		y = display.contentHeight / 2.0 - 500,
 		width = display.contentWidth,    
 		height = 70;
 		font = native.systemFontBold,   
@@ -80,7 +81,7 @@ function scene:show( event )
 	youWinText:setFillColor(0,1,1);
 
 	playAgainButton = display.newRect(display.contentWidth / 2.0, 
-	  								   display.contentHeight / 2.0 + 100, 
+	  								   display.contentHeight / 2.0 - 300, 
 									   display.contentWidth / 2.0, 
 									   display.contentWidth / 5.0);
     playAgainButton:setFillColor(0,1,1);
@@ -99,6 +100,21 @@ function scene:show( event )
 	playAgainButtonText = display.newText(playAgainButtonTextOpt);
 	playAgainButtonText:setFillColor(0,0,0);
 
+	local creditTextOpt = 
+	{
+		text =
+			"Credits:\n\n"..
+			"1) Game idea from Fortafy Games Color Switch\n"..
+			"2) Color changer star image from:\n"..
+			"    http://shadowfight.wikia.com/wiki/File:Exclusive_star.png\n"..
+			"3) Prof. Kim notes\n",
+		x = display.contentWidth / 2 + 3,
+		y = display.contentHeight / 2 - 25,
+		font = native.systemFontBold,
+		fontSize = 24
+	}
+	creditText = display.newText(creditTextOpt);
+	creditText:setFillColor(1,1,1);
    end
 end
 
@@ -130,7 +146,8 @@ function scene:destroy( event )
    -- Insert code here to clean up the scene.
    -- Example: remove display objects, save state, etc.
    	youWinText:removeSelf();
-	playAgainButton:removeSelf(); 
+	playAgainButton:removeSelf();
+	creditText:removeSelf(); 
 end
 
 ---------------------------------------------------------------------------------
