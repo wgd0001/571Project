@@ -1,4 +1,19 @@
+--[[
+
+CS 571 Final Project
+Stephen Cothren & Trey Dickerhoff
+Color Matcher
+
+startScene.lua
+
+Start scene for Color Matcher.  Allows player to choose
+their difficulty level and start the game
+
+--]]
+
+-- load composer module
 local composer = require( "composer" )
+-- create a new scene
 local scene = composer.newScene()
 
 ---------------------------------------------------------------------------------
@@ -11,7 +26,6 @@ local nameText = nil;
 local classText = nil;
 local authorText = nil;
 local selectLevelText = nil;
-
 local easyButton = nil; 
 local easyButtonText = nil;
 local normalButton = nil;
@@ -19,22 +33,31 @@ local normalButtonText = nil;
 local hardButton = nil;
 local hardButtonText = nil;
 
+-- function: startEasyMode()
+-- input: na
+-- output: na
+-- description: start the game in easy mode
 local function startEasyMode()
-	print ("easy...");
 	composer.removeScene("startScene", false);
 	local options = {effect="fade", time=1000, params={mode="Easy"}}
 	composer.gotoScene( "SceneFactory", options);
 end
 
+-- function: startNormalMode()
+-- input: na
+-- output: na
+-- description: start the game in normal mode
 local function startNormalMode()
-	print ("Normal");
 	composer.removeScene("startScene", false);
 	local options = {effect="fade", time=1000, params={mode="Normal"}}
 	composer.gotoScene( "SceneFactory", options);
 end
 
+-- function: startHardMode()
+-- input: na
+-- output: na
+-- description: start the game in hard mode
 local function startHardMode()
-	print ("Hard!");
 	composer.removeScene("startScene", false);
 	local options = {effect="fade", time=1000, params={mode="Hard"}}
 	composer.gotoScene( "SceneFactory", options);
@@ -42,18 +65,22 @@ end
 
 ---------------------------------------------------------------------------------
 
--- "scene:create()"
+-- function: create(event)
+-- input: event
+-- output: scene
+-- description: called when the scene is being created
 function scene:create( event )
-
    local sceneGroup = self.view
 
    -- Initialize the scene here.
    -- Example: add display objects to "sceneGroup", add touch listeners, etc.
 end
 
--- "scene:show()"
+-- function: show(event)
+-- input: event
+-- output: scene
+-- description: called when the scene is ready to be displayed
 function scene:show( event )
-
    local sceneGroup = self.view
    local phase = event.phase
 
@@ -182,9 +209,11 @@ function scene:show( event )
    end
 end
 
--- "scene:hide()"
+-- function: hide(event)
+-- input: event
+-- output: scene
+-- description: called when the scene is being hidden
 function scene:hide( event )
-
    local sceneGroup = self.view
    local phase = event.phase
 
@@ -197,7 +226,10 @@ function scene:hide( event )
    end
 end
 
--- "scene:destroy()"
+-- function: destroy(event)
+-- input: event
+-- output: scene
+-- description: called when the scene is being destroyed
 function scene:destroy( event )
    local sceneGroup = self.view
    -- Called prior to the removal of scene's view ("sceneGroup").

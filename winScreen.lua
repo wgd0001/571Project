@@ -1,4 +1,19 @@
+--[[
+
+CS 571 Final Project
+Stephen Cothren & Trey Dickerhoff
+Color Matcher
+
+winScreen.lua
+
+Win scene for Color Matcher.  Allows the place to
+restart the game if they choose.
+
+--]]
+
+-- load composer module
 local composer = require( "composer" )
+-- create a new scene
 local scene = composer.newScene()
 
 ---------------------------------------------------------------------------------
@@ -8,10 +23,13 @@ local scene = composer.newScene()
 
 -- local forward references should go here
 local youWinText = nil;
-
 local playAgainButton = nil; 
 local playAgainText = nil;
 
+-- function: playAgain()
+-- input: na
+-- output: na
+-- description: transitions to start scene so player can begin a new game
 local function playAgain()
 	composer.removeScene("winScreen", false);
 	local options = {effect="fade", time=1000}
@@ -20,18 +38,24 @@ end
 
 ---------------------------------------------------------------------------------
 
--- "scene:create()"
-function scene:create( event )
 
+-- function: create(event)
+-- input: event
+-- output: scene
+-- description: called when the scene is being created
+function scene:create( event )
    local sceneGroup = self.view
 
    -- Initialize the scene here.
    -- Example: add display objects to "sceneGroup", add touch listeners, etc.
 end
 
--- "scene:show()"
-function scene:show( event )
 
+-- function: show(event)
+-- input: event
+-- output: scene
+-- description: called when the scene is ready to be displayed
+function scene:show( event )
    local sceneGroup = self.view
    local phase = event.phase
 
@@ -78,7 +102,10 @@ function scene:show( event )
    end
 end
 
--- "scene:hide()"
+-- function: hide(event)
+-- input: event
+-- output: scene
+-- description: called when the scene is being hidden
 function scene:hide( event )
 
    local sceneGroup = self.view
@@ -93,7 +120,10 @@ function scene:hide( event )
    end
 end
 
--- "scene:destroy()"
+-- function: destroy(event)
+-- input: event
+-- output: scene
+-- description: called when the scene is being destroyed
 function scene:destroy( event )
    local sceneGroup = self.view
    -- Called prior to the removal of scene's view ("sceneGroup").
